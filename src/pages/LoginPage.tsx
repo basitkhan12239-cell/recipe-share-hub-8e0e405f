@@ -3,40 +3,40 @@
  * User authentication with login and signup forms
  */
 
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ChefHat, Mail, Lock, User, Eye, EyeOff, ArrowRight } from 'lucide-react';
-import { Layout } from '@/components/layout';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/context';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ChefHat, Mail, Lock, User, Eye, EyeOff, ArrowRight } from "lucide-react";
+import { Layout } from "@/components/layout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context";
 
-type AuthMode = 'login' | 'signup';
+type AuthMode = "login" | "signup";
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { login, register } = useAuth();
-  
-  const [mode, setMode] = useState<AuthMode>('login');
+
+  const [mode, setMode] = useState<AuthMode>("login");
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
     rememberMe: false,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -45,11 +45,11 @@ const LoginPage: React.FC = () => {
     setIsSubmitting(true);
 
     // Validation
-    if (mode === 'signup' && formData.password !== formData.confirmPassword) {
+    if (mode === "signup" && formData.password !== formData.confirmPassword) {
       toast({
-        title: 'Passwords do not match',
-        description: 'Please make sure your passwords match.',
-        variant: 'destructive',
+        title: "Passwords do not match",
+        description: "Please make sure your passwords match.",
+        variant: "destructive",
       });
       setIsSubmitting(false);
       return;
@@ -58,7 +58,7 @@ const LoginPage: React.FC = () => {
     try {
       let success = false;
 
-      if (mode === 'login') {
+      if (mode === "login") {
         success = await login({
           email: formData.email,
           password: formData.password,
@@ -74,18 +74,19 @@ const LoginPage: React.FC = () => {
 
       if (success) {
         toast({
-          title: mode === 'login' ? 'Welcome back!' : 'Account created!',
-          description: mode === 'login' 
-            ? 'You have been logged in successfully.' 
-            : 'Your account has been created. Welcome to TastyBites!',
+          title: mode === "login" ? "Welcome back!" : "Account created!",
+          description:
+            mode === "login"
+              ? "You have been logged in successfully."
+              : "Your account has been created. Welcome to TastyBites!",
         });
-        navigate('/');
+        navigate("/");
       }
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Something went wrong. Please try again.',
-        variant: 'destructive',
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
@@ -93,12 +94,12 @@ const LoginPage: React.FC = () => {
   };
 
   const toggleMode = () => {
-    setMode(mode === 'login' ? 'signup' : 'login');
+    setMode(mode === "login" ? "signup" : "login");
     setFormData({
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
       rememberMe: false,
     });
   };
@@ -115,12 +116,12 @@ const LoginPage: React.FC = () => {
                 <span className="font-display text-2xl font-bold">TastyBites</span>
               </Link>
               <h1 className="font-display text-3xl font-bold text-foreground mb-2">
-                {mode === 'login' ? 'Welcome Back!' : 'Create Account'}
+                {mode === "login" ? "Welcome Back!" : "Create Account"}
               </h1>
               <p className="text-muted-foreground">
-                {mode === 'login'
-                  ? 'Sign in to access your recipes and saved favorites'
-                  : 'Join our community of food lovers'}
+                {mode === "login"
+                  ? "Sign in to access your recipes and saved favorites"
+                  : "Join our community of food lovers"}
               </p>
             </div>
 
@@ -128,7 +129,7 @@ const LoginPage: React.FC = () => {
             <div className="bg-card rounded-2xl shadow-card-lg p-6 lg:p-8 animate-fade-in">
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Name Field (Signup only) */}
-                {mode === 'signup' && (
+                {mode === "signup" && (
                   <div className="space-y-2">
                     <Label htmlFor="name">Full Name</Label>
                     <div className="relative">
@@ -173,7 +174,7 @@ const LoginPage: React.FC = () => {
                     <Input
                       id="password"
                       name="password"
-                      type={showPassword ? 'text' : 'password'}
+                      type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
                       value={formData.password}
                       onChange={handleChange}
@@ -192,7 +193,7 @@ const LoginPage: React.FC = () => {
                 </div>
 
                 {/* Confirm Password (Signup only) */}
-                {mode === 'signup' && (
+                {mode === "signup" && (
                   <div className="space-y-2">
                     <Label htmlFor="confirmPassword">Confirm Password</Label>
                     <div className="relative">
@@ -200,7 +201,7 @@ const LoginPage: React.FC = () => {
                       <Input
                         id="confirmPassword"
                         name="confirmPassword"
-                        type={showPassword ? 'text' : 'password'}
+                        type={showPassword ? "text" : "password"}
                         placeholder="••••••••"
                         value={formData.confirmPassword}
                         onChange={handleChange}
@@ -213,44 +214,36 @@ const LoginPage: React.FC = () => {
                 )}
 
                 {/* Remember Me & Forgot Password (Login only) */}
-                {mode === 'login' && (
+                {mode === "login" && (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Checkbox
                         id="rememberMe"
                         checked={formData.rememberMe}
-                        onCheckedChange={(checked) => 
-                          setFormData(prev => ({ ...prev, rememberMe: checked as boolean }))
+                        onCheckedChange={(checked) =>
+                          setFormData((prev) => ({ ...prev, rememberMe: checked as boolean }))
                         }
                       />
                       <Label htmlFor="rememberMe" className="text-sm cursor-pointer">
                         Remember me
                       </Label>
                     </div>
-                    <button
-                      type="button"
-                      className="text-sm text-primary hover:underline"
-                    >
+                    <button type="button" className="text-sm text-primary hover:underline">
                       Forgot password?
                     </button>
                   </div>
                 )}
 
                 {/* Submit Button */}
-                <Button 
-                  type="submit" 
-                  size="lg" 
-                  className="w-full gap-2" 
-                  disabled={isSubmitting}
-                >
+                <Button type="submit" size="lg" className="w-full gap-2" disabled={isSubmitting}>
                   {isSubmitting ? (
                     <>
                       <div className="h-5 w-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                      {mode === 'login' ? 'Signing in...' : 'Creating account...'}
+                      {mode === "login" ? "Signing in..." : "Creating account..."}
                     </>
                   ) : (
                     <>
-                      {mode === 'login' ? 'Sign In' : 'Create Account'}
+                      {mode === "login" ? "Sign In" : "Create Account"}
                       <ArrowRight className="h-5 w-5" />
                     </>
                   )}
@@ -302,24 +295,24 @@ const LoginPage: React.FC = () => {
             {/* Toggle Auth Mode */}
             <div className="text-center mt-6">
               <p className="text-muted-foreground">
-                {mode === 'login' ? "Don't have an account?" : 'Already have an account?'}
-                <button
-                  type="button"
-                  onClick={toggleMode}
-                  className="ml-1 text-primary font-medium hover:underline"
-                >
-                  {mode === 'login' ? 'Sign up' : 'Sign in'}
+                {mode === "login" ? "Don't have an account?" : "Already have an account?"}
+                <button type="button" onClick={toggleMode} className="ml-1 text-primary font-medium hover:underline">
+                  {mode === "login" ? "Sign up" : "Sign in"}
                 </button>
               </p>
             </div>
 
             {/* Terms */}
-            {mode === 'signup' && (
+            {mode === "signup" && (
               <p className="text-center text-xs text-muted-foreground mt-4">
-                By creating an account, you agree to our{' '}
-                <button type="button" className="text-primary hover:underline">Terms of Service</button>
-                {' '}and{' '}
-                <button type="button" className="text-primary hover:underline">Privacy Policy</button>
+                By creating an account, you agree to our{" "}
+                <button type="button" className="text-primary hover:underline">
+                  Terms of Service
+                </button>{" "}
+                and{" "}
+                <button type="button" className="text-primary hover:underline">
+                  Privacy Policy
+                </button>
               </p>
             )}
           </div>
