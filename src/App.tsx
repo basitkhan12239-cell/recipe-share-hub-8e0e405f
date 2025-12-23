@@ -12,6 +12,9 @@ import RecipeDetailPage from "./pages/RecipeDetailPage";
 import SubmitRecipePage from "./pages/SubmitRecipePage";
 import ProfilePage from "./pages/ProfilePage";
 import CategoriesPage from "./pages/CategoriesPage";
+import BlogPage from "./pages/BlogPage";
+import ContactPage from "./pages/ContactPage";
+import LoginPage from "./pages/LoginPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,10 +34,9 @@ const App = () => (
               <Route path="/submit" element={<SubmitRecipePage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/categories" element={<CategoriesPage />} />
-              {/* Placeholder routes */}
-              <Route path="/blog" element={<NotFound />} />
-              <Route path="/contact" element={<NotFound />} />
-              <Route path="/login" element={<NotFound />} />
+              <Route path="/blog" element={<BlogPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/login" element={<LoginPage />} />
               {/* Catch-all route */}
               <Route path="*" element={<NotFound />} />
             </Routes>
