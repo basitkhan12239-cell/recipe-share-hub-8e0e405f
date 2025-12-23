@@ -14,6 +14,7 @@ import ProfilePage from "./pages/ProfilePage";
 import CategoriesPage from "./pages/CategoriesPage";
 import BlogPage from "./pages/BlogPage";
 import ContactPage from "./pages/ContactPage";
+import AboutPage from "./pages/AboutPage";
 import LoginPage from "./pages/LoginPage";
 import NotFound from "./pages/NotFound";
 
@@ -36,6 +37,7 @@ const App = () => (
               <Route path="/categories" element={<CategoriesPage />} />
               <Route path="/blog" element={<BlogPage />} />
               <Route path="/contact" element={<ContactPage />} />
+              <Route path="/about" element={<AboutPage />} />
               <Route path="/login" element={<LoginPage />} />
               {/* Catch-all route */}
               <Route path="*" element={<NotFound />} />
