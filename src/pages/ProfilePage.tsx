@@ -3,20 +3,23 @@
  * User profile with saved and submitted recipes
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { User, BookmarkIcon, ChefHat, Settings } from 'lucide-react';
+import { BookmarkIcon, ChefHat, Settings, MapPin } from 'lucide-react';
 import { Layout } from '@/components/layout';
 import { RecipeCard } from '@/components/recipes';
+import { EditProfileDialog } from '@/components/profile';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAuth, useSavedRecipes } from '@/context';
+import { useSavedRecipes } from '@/context';
+import { useLocalProfile } from '@/hooks/useLocalProfile';
 import { dummyRecipes } from '@/data/recipes';
 import { RecipeCardData } from '@/types';
 
 const ProfilePage: React.FC = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { profile, saveProfile } = useLocalProfile();
   const { savedRecipes } = useSavedRecipes();
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   // Get saved recipes data
   const savedRecipeData = dummyRecipes.filter(r => savedRecipes.includes(r.id));
@@ -40,17 +43,6 @@ const ProfilePage: React.FC = () => {
     authorAvatar: recipe.authorAvatar,
   });
 
-  // Demo user for non-authenticated state
-  const displayUser = user || {
-    name: 'Guest User',
-    email: 'guest@example.com',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop',
-    bio: 'Sign in to save recipes and submit your own creations!',
-    recipesCount: 0,
-    followersCount: 0,
-    followingCount: 0,
-  };
-
   return (
     <Layout>
       {/* Profile Header */}
@@ -58,19 +50,27 @@ const ProfilePage: React.FC = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center gap-6 max-w-4xl mx-auto">
             <img
-              src={displayUser.avatar}
-              alt={displayUser.name}
+              src={profile.avatar}
+              alt={profile.name}
               className="h-24 w-24 md:h-32 md:w-32 rounded-full object-cover border-4 border-card shadow-card-lg"
             />
             <div className="text-center md:text-left flex-1">
-              <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground">{displayUser.name}</h1>
-              <p className="text-muted-foreground mt-1">{displayUser.bio}</p>
+              <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground">{profile.name}</h1>
+              {profile.location && (
+                <p className="text-muted-foreground flex items-center justify-center md:justify-start gap-1 mt-1">
+                  <MapPin className="h-4 w-4" />
+                  {profile.location}
+                </p>
+              )}
+              <p className="text-muted-foreground mt-1">{profile.bio}</p>
               <div className="flex flex-wrap justify-center md:justify-start gap-6 mt-4">
                 <div><span className="font-bold text-foreground">{submittedRecipes.length}</span><span className="text-muted-foreground ml-1">Recipes</span></div>
                 <div><span className="font-bold text-foreground">{savedRecipes.length}</span><span className="text-muted-foreground ml-1">Saved</span></div>
               </div>
             </div>
-            <Button variant="outline" className="gap-2"><Settings className="h-4 w-4" />Edit Profile</Button>
+            <Button variant="outline" className="gap-2" onClick={() => setIsEditOpen(true)}>
+              <Settings className="h-4 w-4" />Edit Profile
+            </Button>
           </div>
         </div>
       </section>
@@ -116,6 +116,14 @@ const ProfilePage: React.FC = () => {
           </Tabs>
         </div>
       </section>
+
+      {/* Edit Profile Dialog */}
+      <EditProfileDialog
+        open={isEditOpen}
+        onOpenChange={setIsEditOpen}
+        profileData={profile}
+        onSave={saveProfile}
+      />
     </Layout>
   );
 };
