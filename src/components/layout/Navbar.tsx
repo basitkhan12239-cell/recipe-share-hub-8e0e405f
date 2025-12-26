@@ -4,8 +4,8 @@
  */
 
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ChefHat, Search, User, BookmarkIcon } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, X, ChefHat, Search, User, BookmarkIcon, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SearchDialog } from './SearchDialog';
 import { useAuth } from '@/context';
@@ -14,7 +14,13 @@ const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const location = useLocation();
-  const { isAuthenticated, user } = useAuth();
+  const navigate = useNavigate();
+  const { isAuthenticated, user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
 
   // Navigation links
   const navLinks = [
@@ -83,20 +89,31 @@ const Navbar: React.FC = () => {
 
               {/* User Menu / Login */}
               {isAuthenticated ? (
-                <Link to="/profile">
-                  <Button variant="ghost" className="gap-2">
-                    {user?.avatar ? (
-                      <img 
-                        src={user.avatar} 
-                        alt={user.name} 
-                        className="h-8 w-8 rounded-full object-cover"
-                      />
-                    ) : (
-                      <User className="h-5 w-5" />
-                    )}
-                    <span className="font-medium">{user?.name?.split(' ')[0]}</span>
+                <div className="flex items-center gap-2">
+                  <Link to="/profile">
+                    <Button variant="ghost" className="gap-2">
+                      {user?.avatar ? (
+                        <img 
+                          src={user.avatar} 
+                          alt={user.name} 
+                          className="h-8 w-8 rounded-full object-cover"
+                        />
+                      ) : (
+                        <User className="h-5 w-5" />
+                      )}
+                      <span className="font-medium">{user?.name?.split(' ')[0]}</span>
+                    </Button>
+                  </Link>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={handleLogout}
+                    className="text-muted-foreground hover:text-destructive"
+                    title="Logout"
+                  >
+                    <LogOut className="h-5 w-5" />
                   </Button>
-                </Link>
+                </div>
               ) : (
                 <Link to="/login">
                   <Button className="font-medium">
@@ -148,22 +165,34 @@ const Navbar: React.FC = () => {
                 <hr className="my-2 border-border" />
                 
                 {isAuthenticated ? (
-                  <Link
-                    to="/profile"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-muted transition-colors"
-                  >
-                    {user?.avatar ? (
-                      <img 
-                        src={user.avatar} 
-                        alt={user.name} 
-                        className="h-8 w-8 rounded-full object-cover"
-                      />
-                    ) : (
-                      <User className="h-6 w-6" />
-                    )}
-                    <span className="font-medium">{user?.name}</span>
-                  </Link>
+                  <>
+                    <Link
+                      to="/profile"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-muted transition-colors"
+                    >
+                      {user?.avatar ? (
+                        <img 
+                          src={user.avatar} 
+                          alt={user.name} 
+                          className="h-8 w-8 rounded-full object-cover"
+                        />
+                      ) : (
+                        <User className="h-6 w-6" />
+                      )}
+                      <span className="font-medium">{user?.name}</span>
+                    </Link>
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setIsMenuOpen(false);
+                      }}
+                      className="flex items-center gap-3 px-4 py-3 rounded-lg text-destructive hover:bg-destructive/10 transition-colors w-full"
+                    >
+                      <LogOut className="h-5 w-5" />
+                      <span className="font-medium">Logout</span>
+                    </button>
+                  </>
                 ) : (
                   <Link to="/login" onClick={() => setIsMenuOpen(false)}>
                     <Button className="w-full font-medium">
