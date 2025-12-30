@@ -57,13 +57,16 @@ const Navbar: React.FC = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive(link.path)
-                      ? 'text-primary bg-primary/10'
+                      ? 'text-primary'
                       : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                   }`}
                 >
                   {link.name}
+                  {isActive(link.path) && (
+                    <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-orange-500 rounded-full" />
+                  )}
                 </Link>
               ))}
             </div>
