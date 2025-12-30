@@ -55,7 +55,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
 
   return (
     <Link to={`/recipe/${recipe.id}`} className="block group">
-      <article className="recipe-card bg-card rounded-xl overflow-hidden shadow-card-md hover:shadow-card-xl">
+      <article className="recipe-card bg-card rounded-xl overflow-hidden shadow-card-md hover:shadow-card-xl border-2 border-orange-500">
         {/* Image Container */}
         <div className="relative aspect-[4/3] overflow-hidden">
           <img
