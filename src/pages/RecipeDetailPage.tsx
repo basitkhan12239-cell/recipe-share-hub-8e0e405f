@@ -125,32 +125,8 @@ const RecipeDetailPage: React.FC = () => {
       <section className="py-6 lg:py-10">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-            {/* Image */}
-            <div className="relative aspect-[4/3] lg:aspect-square rounded-2xl overflow-hidden shadow-card-lg">
-              <img
-                src={recipe.image}
-                alt={recipe.title}
-                className="w-full h-full object-cover"
-              />
-              {/* Save Button */}
-              <button
-                onClick={() => toggleSaveRecipe(recipe.id)}
-                className={`absolute top-4 right-4 p-3 rounded-full transition-all ${
-                  isSaved 
-                    ? 'bg-primary text-primary-foreground' 
-                    : 'bg-card/90 text-foreground hover:bg-card'
-                }`}
-              >
-                {isSaved ? (
-                  <BookmarkCheck className="h-6 w-6" />
-                ) : (
-                  <Bookmark className="h-6 w-6" />
-                )}
-              </button>
-            </div>
-
-            {/* Details */}
-            <div className="flex flex-col">
+            {/* Details - Now on Left */}
+            <div className="flex flex-col order-2 lg:order-1">
               {/* Category & Difficulty */}
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 <Badge variant="secondary">{categoryNames[recipe.category]}</Badge>
@@ -240,6 +216,30 @@ const RecipeDetailPage: React.FC = () => {
                   Share
                 </Button>
               </div>
+            </div>
+
+            {/* Image - Now on Right */}
+            <div className="relative aspect-[4/3] lg:aspect-square rounded-2xl overflow-hidden shadow-card-lg order-1 lg:order-2">
+              <img
+                src={recipe.image}
+                alt={recipe.title}
+                className="w-full h-full object-cover"
+              />
+              {/* Save Button */}
+              <button
+                onClick={() => toggleSaveRecipe(recipe.id)}
+                className={`absolute top-4 right-4 p-3 rounded-full transition-all ${
+                  isSaved 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'bg-card/90 text-foreground hover:bg-card'
+                }`}
+              >
+                {isSaved ? (
+                  <BookmarkCheck className="h-6 w-6" />
+                ) : (
+                  <Bookmark className="h-6 w-6" />
+                )}
+              </button>
             </div>
           </div>
         </div>
