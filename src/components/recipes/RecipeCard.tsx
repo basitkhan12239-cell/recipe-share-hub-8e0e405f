@@ -72,22 +72,6 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
             </Badge>
           </div>
 
-          {/* Save Button */}
-          <button
-            onClick={handleSaveClick}
-            className={`absolute top-3 right-3 p-2 rounded-full transition-all ${
-              isSaved 
-                ? 'bg-primary text-primary-foreground' 
-                : 'bg-card/80 text-foreground hover:bg-card'
-            }`}
-            aria-label={isSaved ? 'Unsave recipe' : 'Save recipe'}
-          >
-            {isSaved ? (
-              <BookmarkCheck className="h-5 w-5" />
-            ) : (
-              <Bookmark className="h-5 w-5" />
-            )}
-          </button>
 
           {/* Gradient Overlay */}
           <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-foreground/60 to-transparent" />
@@ -101,9 +85,26 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
 
         {/* Content */}
         <div className="p-4">
-          <h3 className="font-display text-lg font-semibold text-card-foreground line-clamp-1 group-hover:text-primary transition-colors">
-            {recipe.title}
-          </h3>
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="font-display text-lg font-semibold text-card-foreground line-clamp-1 group-hover:text-primary transition-colors">
+              {recipe.title}
+            </h3>
+            <button
+              onClick={handleSaveClick}
+              className={`p-1.5 rounded-full transition-all flex-shrink-0 ${
+                isSaved 
+                  ? 'bg-primary text-primary-foreground' 
+                  : 'bg-muted text-foreground hover:bg-primary/20'
+              }`}
+              aria-label={isSaved ? 'Unsave recipe' : 'Save recipe'}
+            >
+              {isSaved ? (
+                <BookmarkCheck className="h-4 w-4" />
+              ) : (
+                <Bookmark className="h-4 w-4" />
+              )}
+            </button>
+          </div>
           
           <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
             {recipe.description}
