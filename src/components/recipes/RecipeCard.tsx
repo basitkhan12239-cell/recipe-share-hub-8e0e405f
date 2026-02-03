@@ -55,7 +55,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
 
   return (
     <Link to={`/recipe/${recipe.id}`} className="block group">
-      <article className="recipe-card bg-card rounded-xl overflow-hidden shadow-card-md hover:shadow-card-xl border-2 border-orange-500">
+      <article className="recipe-card bg-card rounded-xl overflow-hidden shadow-[0_4px_20px_-4px_hsl(var(--primary)/0.25)] hover:shadow-[0_8px_30px_-4px_hsl(var(--primary)/0.35)] transition-shadow duration-300">
         {/* Image Container */}
         <div className="relative aspect-[4/3] overflow-hidden">
           <img
@@ -72,6 +72,22 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
             </Badge>
           </div>
 
+          {/* Save Button */}
+          <button
+            onClick={handleSaveClick}
+            className={`absolute top-3 right-3 p-2 rounded-full transition-all ${
+              isSaved 
+                ? 'bg-primary text-primary-foreground' 
+                : 'bg-card/90 text-foreground hover:bg-card'
+            }`}
+            aria-label={isSaved ? 'Unsave recipe' : 'Save recipe'}
+          >
+            {isSaved ? (
+              <BookmarkCheck className="h-5 w-5" />
+            ) : (
+              <Bookmark className="h-5 w-5" />
+            )}
+          </button>
 
           {/* Gradient Overlay */}
           <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-foreground/60 to-transparent" />
@@ -85,26 +101,9 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
 
         {/* Content */}
         <div className="p-4">
-          <div className="flex items-center justify-between gap-2">
-            <h3 className="font-display text-lg font-semibold text-card-foreground line-clamp-1 group-hover:text-primary transition-colors">
-              {recipe.title}
-            </h3>
-            <button
-              onClick={handleSaveClick}
-              className={`p-1.5 rounded-full transition-all flex-shrink-0 ${
-                isSaved 
-                  ? 'bg-primary text-primary-foreground' 
-                  : 'bg-muted text-foreground hover:bg-primary/20'
-              }`}
-              aria-label={isSaved ? 'Unsave recipe' : 'Save recipe'}
-            >
-              {isSaved ? (
-                <BookmarkCheck className="h-4 w-4" />
-              ) : (
-                <Bookmark className="h-4 w-4" />
-              )}
-            </button>
-          </div>
+          <h3 className="font-display text-lg font-semibold text-card-foreground line-clamp-1 group-hover:text-primary transition-colors">
+            {recipe.title}
+          </h3>
           
           <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
             {recipe.description}
