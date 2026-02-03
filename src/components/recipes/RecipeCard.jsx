@@ -6,16 +6,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Clock, Star, Bookmark, BookmarkCheck } from 'lucide-react';
-import { RecipeCardData, RecipeCategory } from '@/types';
 import { useSavedRecipes } from '@/context';
 import { Badge } from '@/components/ui/badge';
 
-interface RecipeCardProps {
-  recipe: RecipeCardData;
-}
-
 // Category color mapping
-const categoryColors: Record<RecipeCategory, string> = {
+const categoryColors = {
   breakfast: 'bg-category-breakfast/20 text-category-breakfast',
   lunch: 'bg-category-lunch/20 text-category-lunch',
   dinner: 'bg-category-dinner/20 text-category-dinner',
@@ -29,7 +24,7 @@ const categoryColors: Record<RecipeCategory, string> = {
 };
 
 // Category display names
-const categoryNames: Record<RecipeCategory, string> = {
+const categoryNames = {
   breakfast: 'Breakfast',
   lunch: 'Lunch',
   dinner: 'Dinner',
@@ -42,12 +37,12 @@ const categoryNames: Record<RecipeCategory, string> = {
   beverages: 'Beverages',
 };
 
-const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
+const RecipeCard = ({ recipe }) => {
   const { isRecipeSaved, toggleSaveRecipe } = useSavedRecipes();
   const isSaved = isRecipeSaved(recipe.id);
   const totalTime = recipe.prepTime + recipe.cookTime;
 
-  const handleSaveClick = (e: React.MouseEvent) => {
+  const handleSaveClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
     toggleSaveRecipe(recipe.id);

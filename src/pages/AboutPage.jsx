@@ -9,7 +9,7 @@ import { ChefHat, Users, Heart, Award, BookOpen, Utensils } from 'lucide-react';
 import { Layout } from '@/components/layout';
 import { Button } from '@/components/ui/button';
 
-const AboutPage: React.FC = () => {
+const AboutPage = () => {
   const stats = [
     { icon: BookOpen, value: '1000+', label: 'Recipes' },
     { icon: Users, value: '50K+', label: 'Community Members' },

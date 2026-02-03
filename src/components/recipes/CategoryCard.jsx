@@ -5,14 +5,9 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { CategoryInfo, RecipeCategory } from '@/types';
-
-interface CategoryCardProps {
-  category: CategoryInfo;
-}
 
 // Background color mapping for categories
-const categoryBgColors: Record<RecipeCategory, string> = {
+const categoryBgColors = {
   breakfast: 'bg-category-breakfast/10 hover:bg-category-breakfast/20 border-category-breakfast/30',
   lunch: 'bg-category-lunch/10 hover:bg-category-lunch/20 border-category-lunch/30',
   dinner: 'bg-category-dinner/10 hover:bg-category-dinner/20 border-category-dinner/30',
@@ -25,7 +20,7 @@ const categoryBgColors: Record<RecipeCategory, string> = {
   beverages: 'bg-category-quick/10 hover:bg-category-quick/20 border-category-quick/30',
 };
 
-const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
+const CategoryCard = ({ category }) => {
   return (
     <Link 
       to={`/recipes?category=${category.id}`}

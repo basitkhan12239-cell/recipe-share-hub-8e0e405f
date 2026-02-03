@@ -13,9 +13,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { RecipeCategory, DifficultyLevel } from '@/types';
 
-const SubmitRecipePage: React.FC = () => {
+const SubmitRecipePage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -23,11 +22,11 @@ const SubmitRecipePage: React.FC = () => {
   const [instructions, setInstructions] = useState(['']);
 
   const handleAddIngredient = () => setIngredients([...ingredients, { name: '', quantity: '', unit: '' }]);
-  const handleRemoveIngredient = (index: number) => setIngredients(ingredients.filter((_, i) => i !== index));
+  const handleRemoveIngredient = (index) => setIngredients(ingredients.filter((_, i) => i !== index));
   const handleAddInstruction = () => setInstructions([...instructions, '']);
-  const handleRemoveInstruction = (index: number) => setInstructions(instructions.filter((_, i) => i !== index));
+  const handleRemoveInstruction = (index) => setInstructions(instructions.filter((_, i) => i !== index));
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     

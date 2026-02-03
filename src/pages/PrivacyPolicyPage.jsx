@@ -5,7 +5,7 @@
 import React from 'react';
 import { Layout } from '@/components/layout';
 
-const PrivacyPolicyPage: React.FC = () => {
+const PrivacyPolicyPage = () => {
   return (
     <Layout>
       <section className="py-12 lg:py-16">
