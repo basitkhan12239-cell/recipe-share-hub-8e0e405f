@@ -8,7 +8,7 @@ import { Layout } from '@/components/layout';
 import { CategoryCard } from '@/components/recipes';
 import { categories } from '@/data/recipes';
 
-const CategoriesPage: React.FC = () => {
+const CategoriesPage = () => {
   return (
     <Layout>
       {/* Page Header */}

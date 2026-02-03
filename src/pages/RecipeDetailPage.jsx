@@ -22,13 +22,12 @@ import { Layout } from '@/components/layout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Recipe, RecipeCategory } from '@/types';
 import { getRecipeById } from '@/api/recipes';
 import { useSavedRecipes } from '@/context';
 import { dummyReviews } from '@/data/recipes';
 
 // Category display names
-const categoryNames: Record<RecipeCategory, string> = {
+const categoryNames = {
   breakfast: 'Breakfast',
   lunch: 'Lunch',
   dinner: 'Dinner',
@@ -48,9 +47,9 @@ const difficultyColors = {
   hard: 'bg-category-desserts/20 text-category-desserts',
 };
 
-const RecipeDetailPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const [recipe, setRecipe] = useState<Recipe | null>(null);
+const RecipeDetailPage = () => {
+  const { id } = useParams();
+  const [recipe, setRecipe] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const { isRecipeSaved, toggleSaveRecipe } = useSavedRecipes();
 

@@ -12,7 +12,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 
-const FAQPage: React.FC = () => {
+const FAQPage = () => {
   const faqs = [
     {
       question: 'How do I create an account?',

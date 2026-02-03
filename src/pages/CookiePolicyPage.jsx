@@ -5,7 +5,7 @@
 import React from 'react';
 import { Layout } from '@/components/layout';
 
-const CookiePolicyPage: React.FC = () => {
+const CookiePolicyPage = () => {
   return (
     <Layout>
       <section className="py-12 lg:py-16">
