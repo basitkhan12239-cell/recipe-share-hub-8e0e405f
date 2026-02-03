@@ -70,10 +70,10 @@ const RecipeCard = ({ recipe }) => {
           {/* Save Button */}
           <button
             onClick={handleSaveClick}
-            className={`absolute top-3 right-3 p-2 rounded-full transition-all ${
+            className={`absolute top-3 right-3 p-2 rounded-full transition-all backdrop-blur-sm ${
               isSaved 
-                ? 'bg-primary text-primary-foreground' 
-                : 'bg-card/90 text-foreground hover:bg-card'
+                ? 'bg-primary/80 text-primary-foreground' 
+                : 'bg-card/60 text-foreground hover:bg-card/80'
             }`}
             aria-label={isSaved ? 'Unsave recipe' : 'Save recipe'}
           >
