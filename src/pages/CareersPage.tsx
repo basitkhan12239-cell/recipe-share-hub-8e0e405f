@@ -10,7 +10,7 @@ import { Layout } from '@/components/layout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
-const CareersPage = () => {
+const CareersPage: React.FC = () => {
   const benefits = [
     'Competitive salary & equity',
     'Flexible work hours',

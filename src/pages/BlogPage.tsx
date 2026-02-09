@@ -88,7 +88,7 @@ const blogPosts = [
 
 const categories = ['All', 'Kitchen Tips', 'Techniques', 'Seasonal', 'Meal Prep', 'Ingredients', 'Vegetarian'];
 
-const BlogPage = () => {
+const BlogPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = React.useState('All');
 
   const filteredPosts = selectedCategory === 'All' 
@@ -98,7 +98,7 @@ const BlogPage = () => {
   const featuredPost = blogPosts.find(post => post.featured);
   const regularPosts = filteredPosts.filter(post => !post.featured || selectedCategory !== 'All');
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'long',
       day: 'numeric',

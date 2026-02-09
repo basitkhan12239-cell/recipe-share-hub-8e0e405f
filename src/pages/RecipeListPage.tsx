@@ -11,27 +11,28 @@ import { RecipeCard, SearchBar } from '@/components/recipes';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Recipe, RecipeCardData, RecipeCategory, DifficultyLevel, RecipeFilters, PaginationInfo } from '@/types';
 import { getRecipes } from '@/api/recipes';
 
-const RecipeListPage = () => {
+const RecipeListPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [recipes, setRecipes] = useState([]);
-  const [pagination, setPagination] = useState(null);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [pagination, setPagination] = useState<PaginationInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
 
   // Get filter values from URL params
-  const currentFilters = {
-    category: searchParams.get('category') || undefined,
-    difficulty: searchParams.get('difficulty') || undefined,
-    maxCookTime: searchParams.get('maxCookTime') ? parseInt(searchParams.get('maxCookTime')) : undefined,
+  const currentFilters: RecipeFilters = {
+    category: searchParams.get('category') as RecipeCategory || undefined,
+    difficulty: searchParams.get('difficulty') as DifficultyLevel || undefined,
+    maxCookTime: searchParams.get('maxCookTime') ? parseInt(searchParams.get('maxCookTime')!) : undefined,
     searchQuery: searchParams.get('q') || undefined,
   };
 
   const currentPage = parseInt(searchParams.get('page') || '1');
 
   // Category options
-  const categoryOptions = [
+  const categoryOptions: { value: RecipeCategory; label: string }[] = [
     { value: 'breakfast', label: 'Breakfast' },
     { value: 'lunch', label: 'Lunch' },
     { value: 'dinner', label: 'Dinner' },
@@ -48,7 +49,7 @@ const RecipeListPage = () => {
   ];
 
   // Difficulty options
-  const difficultyOptions = [
+  const difficultyOptions: { value: DifficultyLevel; label: string }[] = [
     { value: 'easy', label: 'Easy' },
     { value: 'medium', label: 'Medium' },
     { value: 'hard', label: 'Hard' },
@@ -75,7 +76,7 @@ const RecipeListPage = () => {
   }, [searchParams]);
 
   // Update filter in URL
-  const updateFilter = (key, value) => {
+  const updateFilter = (key: string, value: string | undefined) => {
     const newParams = new URLSearchParams(searchParams);
     if (value) {
       newParams.set(key, value);
@@ -92,12 +93,12 @@ const RecipeListPage = () => {
   };
 
   // Handle search
-  const handleSearch = (query) => {
+  const handleSearch = (query: string) => {
     updateFilter('q', query || undefined);
   };
 
   // Convert Recipe to RecipeCardData
-  const toCardData = (recipe) => ({
+  const toCardData = (recipe: Recipe): RecipeCardData => ({
     id: recipe.id,
     title: recipe.title,
     description: recipe.description,

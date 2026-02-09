@@ -6,11 +6,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Clock, Star, Bookmark, BookmarkCheck } from 'lucide-react';
+import { RecipeCardData, RecipeCategory } from '@/types';
 import { useSavedRecipes } from '@/context';
 import { Badge } from '@/components/ui/badge';
 
+interface RecipeCardProps {
+  recipe: RecipeCardData;
+}
+
 // Category color mapping
-const categoryColors = {
+const categoryColors: Record<RecipeCategory, string> = {
   breakfast: 'bg-category-breakfast/20 text-category-breakfast',
   lunch: 'bg-category-lunch/20 text-category-lunch',
   dinner: 'bg-category-dinner/20 text-category-dinner',
@@ -24,7 +29,7 @@ const categoryColors = {
 };
 
 // Category display names
-const categoryNames = {
+const categoryNames: Record<RecipeCategory, string> = {
   breakfast: 'Breakfast',
   lunch: 'Lunch',
   dinner: 'Dinner',
@@ -37,12 +42,12 @@ const categoryNames = {
   beverages: 'Beverages',
 };
 
-const RecipeCard = ({ recipe }) => {
+const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
   const { isRecipeSaved, toggleSaveRecipe } = useSavedRecipes();
   const isSaved = isRecipeSaved(recipe.id);
   const totalTime = recipe.prepTime + recipe.cookTime;
 
-  const handleSaveClick = (e) => {
+  const handleSaveClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     toggleSaveRecipe(recipe.id);
@@ -50,7 +55,7 @@ const RecipeCard = ({ recipe }) => {
 
   return (
     <Link to={`/recipe/${recipe.id}`} className="block group">
-      <article className="recipe-card bg-card rounded-xl overflow-hidden shadow-[0_4px_20px_-4px_hsl(var(--primary)/0.25)] hover:shadow-[0_8px_30px_-4px_hsl(var(--primary)/0.35)] transition-shadow duration-300">
+      <article className="recipe-card bg-card rounded-xl overflow-hidden shadow-card-md hover:shadow-card-xl border-2 border-orange-500">
         {/* Image Container */}
         <div className="relative aspect-[4/3] overflow-hidden">
           <img
@@ -70,10 +75,10 @@ const RecipeCard = ({ recipe }) => {
           {/* Save Button */}
           <button
             onClick={handleSaveClick}
-            className={`absolute top-3 right-3 p-2 rounded-full transition-all backdrop-blur-sm ${
+            className={`absolute top-3 right-3 p-2 rounded-full transition-all ${
               isSaved 
-                ? 'bg-primary/80 text-primary-foreground' 
-                : 'bg-card/60 text-foreground hover:bg-card/80'
+                ? 'bg-primary text-primary-foreground' 
+                : 'bg-card/80 text-foreground hover:bg-card'
             }`}
             aria-label={isSaved ? 'Unsave recipe' : 'Save recipe'}
           >
