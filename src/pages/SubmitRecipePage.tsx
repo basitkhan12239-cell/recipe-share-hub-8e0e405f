@@ -1,10 +1,13 @@
 /**
  * Submit Recipe Page
- * Form to submit a new recipe
+ * Form to submit a new recipe with full validation
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useForm, useFieldArray } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Plus, Trash2, Upload, ChefHat } from 'lucide-react';
 import { Layout } from '@/components/layout';
 import { Button } from '@/components/ui/button';
@@ -13,30 +16,79 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { submitRecipe } from '@/api/recipes';
 import { RecipeCategory, DifficultyLevel } from '@/types';
+
+const recipeSchema = z.object({
+  title: z.string().min(3, 'Title must be at least 3 characters'),
+  description: z.string().min(10, 'Description must be at least 10 characters'),
+  category: z.string().min(1, 'Please select a category'),
+  difficulty: z.string().min(1, 'Please select difficulty'),
+  prepTime: z.coerce.number().min(1, 'Required'),
+  cookTime: z.coerce.number().min(0, 'Required'),
+  servings: z.coerce.number().min(1, 'Required'),
+  ingredients: z.array(z.object({
+    name: z.string().min(1, 'Ingredient name required'),
+    quantity: z.string().min(1, 'Qty required'),
+    unit: z.string(),
+  })).min(1, 'Add at least one ingredient'),
+  instructions: z.array(z.object({
+    text: z.string().min(1, 'Step description required'),
+  })).min(1, 'Add at least one step'),
+});
+
+type RecipeFormValues = z.infer<typeof recipeSchema>;
 
 const SubmitRecipePage: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [ingredients, setIngredients] = useState([{ name: '', quantity: '', unit: '' }]);
-  const [instructions, setInstructions] = useState(['']);
 
-  const handleAddIngredient = () => setIngredients([...ingredients, { name: '', quantity: '', unit: '' }]);
-  const handleRemoveIngredient = (index: number) => setIngredients(ingredients.filter((_, i) => i !== index));
-  const handleAddInstruction = () => setInstructions([...instructions, '']);
-  const handleRemoveInstruction = (index: number) => setInstructions(instructions.filter((_, i) => i !== index));
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<RecipeFormValues>({
+    resolver: zodResolver(recipeSchema),
+    defaultValues: {
+      title: '',
+      description: '',
+      category: '',
+      difficulty: '',
+      prepTime: 0,
+      cookTime: 0,
+      servings: 1,
+      ingredients: [{ name: '', quantity: '', unit: '' }],
+      instructions: [{ text: '' }],
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    toast({ title: 'Recipe Submitted!', description: 'Your recipe has been submitted for review.' });
-    setIsSubmitting(false);
-    navigate('/recipes');
+  const { fields: ingredientFields, append: addIngredient, remove: removeIngredient } = useFieldArray({ control, name: 'ingredients' });
+  const { fields: instructionFields, append: addInstruction, remove: removeInstruction } = useFieldArray({ control, name: 'instructions' });
+
+  const onSubmit = async (data: RecipeFormValues) => {
+    try {
+      await submitRecipe({
+        title: data.title,
+        description: data.description,
+        image: null,
+        category: data.category as RecipeCategory,
+        difficulty: data.difficulty as DifficultyLevel,
+        prepTime: data.prepTime,
+        cookTime: data.cookTime,
+        servings: data.servings,
+        ingredients: data.ingredients as { name: string; quantity: string; unit: string }[],
+        instructions: data.instructions.map(i => i.text),
+        tags: [],
+      });
+
+      toast({ title: 'Recipe Submitted! 🎉', description: 'Your recipe has been submitted for review.' });
+      navigate('/recipes');
+    } catch {
+      toast({ title: 'Error', description: 'Something went wrong. Please try again.', variant: 'destructive' });
+    }
   };
 
   return (
@@ -49,52 +101,129 @@ const SubmitRecipePage: React.FC = () => {
             <p className="text-muted-foreground">Share your culinary creation with our community</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
             {/* Basic Info */}
             <div className="bg-card p-6 rounded-xl shadow-card-md space-y-4">
               <h2 className="font-display text-xl font-semibold">Basic Information</h2>
-              <div><Label htmlFor="title">Recipe Title *</Label><Input id="title" placeholder="e.g., Classic Margherita Pizza" required /></div>
-              <div><Label htmlFor="description">Description *</Label><Textarea id="description" placeholder="Describe your recipe..." rows={3} required /></div>
+
+              <div>
+                <Label htmlFor="title">Recipe Title *</Label>
+                <Input id="title" placeholder="e.g., Classic Margherita Pizza" {...register('title')} />
+                {errors.title && <p className="text-sm text-destructive mt-1">{errors.title.message}</p>}
+              </div>
+
+              <div>
+                <Label htmlFor="description">Description *</Label>
+                <Textarea id="description" placeholder="Describe your recipe..." rows={3} {...register('description')} />
+                {errors.description && <p className="text-sm text-destructive mt-1">{errors.description.message}</p>}
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
-                <div><Label>Category *</Label><Select required><SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger><SelectContent><SelectItem value="breakfast">Breakfast</SelectItem><SelectItem value="lunch">Lunch</SelectItem><SelectItem value="dinner">Dinner</SelectItem><SelectItem value="desserts">Desserts</SelectItem></SelectContent></Select></div>
-                <div><Label>Difficulty *</Label><Select required><SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger><SelectContent><SelectItem value="easy">Easy</SelectItem><SelectItem value="medium">Medium</SelectItem><SelectItem value="hard">Hard</SelectItem></SelectContent></Select></div>
+                <div>
+                  <Label>Category *</Label>
+                  <Select onValueChange={(val) => setValue('category', val)} value={watch('category')}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="breakfast">Breakfast</SelectItem>
+                      <SelectItem value="lunch">Lunch</SelectItem>
+                      <SelectItem value="dinner">Dinner</SelectItem>
+                      <SelectItem value="desserts">Desserts</SelectItem>
+                      <SelectItem value="vegetarian">Vegetarian</SelectItem>
+                      <SelectItem value="quick-meals">Quick Meals</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.category && <p className="text-sm text-destructive mt-1">{errors.category.message}</p>}
+                </div>
+                <div>
+                  <Label>Difficulty *</Label>
+                  <Select onValueChange={(val) => setValue('difficulty', val)} value={watch('difficulty')}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="easy">Easy</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="hard">Hard</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.difficulty && <p className="text-sm text-destructive mt-1">{errors.difficulty.message}</p>}
+                </div>
               </div>
+
               <div className="grid grid-cols-3 gap-4">
-                <div><Label htmlFor="prep">Prep Time (min)</Label><Input id="prep" type="number" min="0" required /></div>
-                <div><Label htmlFor="cook">Cook Time (min)</Label><Input id="cook" type="number" min="0" required /></div>
-                <div><Label htmlFor="servings">Servings</Label><Input id="servings" type="number" min="1" required /></div>
+                <div>
+                  <Label htmlFor="prepTime">Prep Time (min)</Label>
+                  <Input id="prepTime" type="number" min="0" {...register('prepTime')} />
+                  {errors.prepTime && <p className="text-sm text-destructive mt-1">{errors.prepTime.message}</p>}
+                </div>
+                <div>
+                  <Label htmlFor="cookTime">Cook Time (min)</Label>
+                  <Input id="cookTime" type="number" min="0" {...register('cookTime')} />
+                  {errors.cookTime && <p className="text-sm text-destructive mt-1">{errors.cookTime.message}</p>}
+                </div>
+                <div>
+                  <Label htmlFor="servings">Servings</Label>
+                  <Input id="servings" type="number" min="1" {...register('servings')} />
+                  {errors.servings && <p className="text-sm text-destructive mt-1">{errors.servings.message}</p>}
+                </div>
               </div>
-              <div><Label>Recipe Image</Label><div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary transition-colors cursor-pointer"><Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" /><p className="text-muted-foreground">Click to upload or drag and drop</p></div></div>
             </div>
 
             {/* Ingredients */}
             <div className="bg-card p-6 rounded-xl shadow-card-md space-y-4">
               <h2 className="font-display text-xl font-semibold">Ingredients</h2>
-              {ingredients.map((_, index) => (
-                <div key={index} className="flex gap-2">
-                  <Input placeholder="Qty" className="w-20" />
-                  <Input placeholder="Unit" className="w-24" />
-                  <Input placeholder="Ingredient name" className="flex-1" />
-                  {ingredients.length > 1 && <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveIngredient(index)}><Trash2 className="h-4 w-4" /></Button>}
+              {ingredientFields.map((field, index) => (
+                <div key={field.id} className="flex gap-2 items-start">
+                  <div className="w-20">
+                    <Input placeholder="Qty" {...register(`ingredients.${index}.quantity`)} />
+                    {errors.ingredients?.[index]?.quantity && <p className="text-xs text-destructive mt-1">Required</p>}
+                  </div>
+                  <Input placeholder="Unit" className="w-24" {...register(`ingredients.${index}.unit`)} />
+                  <div className="flex-1">
+                    <Input placeholder="Ingredient name" {...register(`ingredients.${index}.name`)} />
+                    {errors.ingredients?.[index]?.name && <p className="text-xs text-destructive mt-1">Required</p>}
+                  </div>
+                  {ingredientFields.length > 1 && (
+                    <Button type="button" variant="ghost" size="icon" onClick={() => removeIngredient(index)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               ))}
-              <Button type="button" variant="outline" onClick={handleAddIngredient} className="gap-2"><Plus className="h-4 w-4" />Add Ingredient</Button>
+              <Button type="button" variant="outline" onClick={() => addIngredient({ name: '', quantity: '', unit: '' })} className="gap-2">
+                <Plus className="h-4 w-4" />Add Ingredient
+              </Button>
             </div>
 
             {/* Instructions */}
             <div className="bg-card p-6 rounded-xl shadow-card-md space-y-4">
               <h2 className="font-display text-xl font-semibold">Instructions</h2>
-              {instructions.map((_, index) => (
-                <div key={index} className="flex gap-2">
-                  <span className="flex-shrink-0 w-8 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">{index + 1}</span>
-                  <Textarea placeholder="Describe this step..." className="flex-1" rows={2} />
-                  {instructions.length > 1 && <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveInstruction(index)}><Trash2 className="h-4 w-4" /></Button>}
+              {instructionFields.map((field, index) => (
+                <div key={field.id} className="flex gap-2 items-start">
+                  <span className="flex-shrink-0 w-8 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold text-sm">
+                    {index + 1}
+                  </span>
+                  <div className="flex-1">
+                    <Textarea placeholder="Describe this step..." rows={2} {...register(`instructions.${index}.text`)} />
+                    {errors.instructions?.[index]?.text && <p className="text-xs text-destructive mt-1">Required</p>}
+                  </div>
+                  {instructionFields.length > 1 && (
+                    <Button type="button" variant="ghost" size="icon" onClick={() => removeInstruction(index)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               ))}
-              <Button type="button" variant="outline" onClick={handleAddInstruction} className="gap-2"><Plus className="h-4 w-4" />Add Step</Button>
+              <Button type="button" variant="outline" onClick={() => addInstruction({ text: '' })} className="gap-2">
+                <Plus className="h-4 w-4" />Add Step
+              </Button>
             </div>
 
-            <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>{isSubmitting ? 'Submitting...' : 'Submit Recipe'}</Button>
+            <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? 'Submitting...' : 'Submit Recipe'}
+            </Button>
           </form>
         </div>
       </section>
