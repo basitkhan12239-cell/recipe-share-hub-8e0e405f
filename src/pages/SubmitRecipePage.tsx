@@ -3,12 +3,12 @@
  * Form to submit a new recipe with full validation
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Plus, Trash2, Upload, ChefHat } from 'lucide-react';
+import { Plus, Trash2, Upload, ChefHat, ImagePlus, X } from 'lucide-react';
 import { Layout } from '@/components/layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -42,6 +42,21 @@ type RecipeFormValues = z.infer<typeof recipeSchema>;
 const SubmitRecipePage: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const removeImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+  };
 
   const {
     register,
@@ -73,7 +88,7 @@ const SubmitRecipePage: React.FC = () => {
       await submitRecipe({
         title: data.title,
         description: data.description,
-        image: null,
+        image: imageFile,
         category: data.category as RecipeCategory,
         difficulty: data.difficulty as DifficultyLevel,
         prepTime: data.prepTime,
@@ -105,6 +120,25 @@ const SubmitRecipePage: React.FC = () => {
             {/* Basic Info */}
             <div className="bg-card p-6 rounded-xl shadow-card-md space-y-4">
               <h2 className="font-display text-xl font-semibold">Basic Information</h2>
+
+              {/* Image Upload */}
+              <div>
+                <Label>Recipe Image</Label>
+                {imagePreview ? (
+                  <div className="relative mt-2 w-full h-48 rounded-lg overflow-hidden">
+                    <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                    <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-8 w-8" onClick={removeImage}>
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <label className="mt-2 flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-muted-foreground/30 rounded-lg cursor-pointer hover:border-primary/50 transition-colors">
+                    <ImagePlus className="h-8 w-8 text-muted-foreground mb-2" />
+                    <span className="text-sm text-muted-foreground">Click to upload image</span>
+                    <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+                  </label>
+                )}
+              </div>
 
               <div>
                 <Label htmlFor="title">Recipe Title *</Label>
