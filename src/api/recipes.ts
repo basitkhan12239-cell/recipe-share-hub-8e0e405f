@@ -11,6 +11,30 @@ import { dummyRecipes } from '@/data/recipes';
 // Flag to use dummy data (set to false when backend is ready)
 const USE_DUMMY_DATA = true;
 
+const LOCAL_STORAGE_KEY = 'user_submitted_recipes';
+
+/** Get user-submitted recipes from localStorage */
+const getLocalRecipes = (): Recipe[] => {
+  try {
+    const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
+
+/** Save a recipe to localStorage */
+const saveLocalRecipe = (recipe: Recipe): void => {
+  const existing = getLocalRecipes();
+  existing.unshift(recipe);
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(existing));
+};
+
+/** Get all recipes (dummy + user-submitted) */
+const getAllRecipes = (): Recipe[] => {
+  return [...getLocalRecipes(), ...dummyRecipes];
+};
+
 /**
  * Get all recipes with optional filters
  */
@@ -23,7 +47,7 @@ export const getRecipes = async (
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 300));
     
-    let filteredRecipes = [...dummyRecipes];
+    let filteredRecipes = [...getAllRecipes()];
     
     // Apply filters
     if (filters?.category) {
@@ -76,7 +100,7 @@ export const getRecipes = async (
 export const getRecipeById = async (id: string): Promise<ApiResponse<Recipe>> => {
   if (USE_DUMMY_DATA) {
     await new Promise(resolve => setTimeout(resolve, 200));
-    const recipe = dummyRecipes.find(r => r.id === id);
+    const recipe = getAllRecipes().find(r => r.id === id);
     
     if (!recipe) {
       return { success: false, data: null as unknown as Recipe, message: 'Recipe not found' };
@@ -95,7 +119,7 @@ export const getRecipeById = async (id: string): Promise<ApiResponse<Recipe>> =>
 export const getFeaturedRecipes = async (): Promise<ApiResponse<Recipe[]>> => {
   if (USE_DUMMY_DATA) {
     await new Promise(resolve => setTimeout(resolve, 200));
-    const featured = dummyRecipes.filter(r => r.isFeatured).slice(0, 4);
+    const featured = getAllRecipes().filter(r => r.isFeatured).slice(0, 4);
     return { success: true, data: featured };
   }
   
@@ -109,7 +133,7 @@ export const getFeaturedRecipes = async (): Promise<ApiResponse<Recipe[]>> => {
 export const getTrendingRecipes = async (): Promise<ApiResponse<Recipe[]>> => {
   if (USE_DUMMY_DATA) {
     await new Promise(resolve => setTimeout(resolve, 200));
-    const trending = dummyRecipes.filter(r => r.isTrending).slice(0, 8);
+    const trending = getAllRecipes().filter(r => r.isTrending).slice(0, 8);
     return { success: true, data: trending };
   }
   
@@ -126,13 +150,11 @@ export const submitRecipe = async (recipeData: RecipeFormData): Promise<ApiRespo
     // Simulate successful submission
     console.log('Recipe submitted (dummy):', recipeData);
     
-    // Create a proper Recipe object from form data
     const newRecipe: Recipe = {
-      ...dummyRecipes[0],
-      id: 'new-recipe-id',
+      id: `user-recipe-${Date.now()}`,
       title: recipeData.title,
       description: recipeData.description,
-      image: recipeData.image ? URL.createObjectURL(recipeData.image) : dummyRecipes[0].image,
+      image: recipeData.image ? URL.createObjectURL(recipeData.image) : 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=800&h=600&fit=crop',
       category: recipeData.category,
       difficulty: recipeData.difficulty,
       prepTime: recipeData.prepTime,
@@ -141,7 +163,17 @@ export const submitRecipe = async (recipeData: RecipeFormData): Promise<ApiRespo
       tags: recipeData.tags,
       ingredients: recipeData.ingredients.map((ing, idx) => ({ ...ing, id: `ing-${idx}` })),
       instructions: recipeData.instructions.map((inst, idx) => ({ stepNumber: idx + 1, instruction: inst })),
+      authorId: 'local-user',
+      authorName: 'You',
+      rating: 0,
+      reviewCount: 0,
+      isFeatured: false,
+      isTrending: false,
+      createdAt: new Date().toISOString().split('T')[0],
+      updatedAt: new Date().toISOString().split('T')[0],
     };
+
+    saveLocalRecipe(newRecipe);
     
     return { 
       success: true, 
@@ -174,7 +206,7 @@ export const submitRecipe = async (recipeData: RecipeFormData): Promise<ApiRespo
 export const getUserRecipes = async (userId: string): Promise<ApiResponse<Recipe[]>> => {
   if (USE_DUMMY_DATA) {
     await new Promise(resolve => setTimeout(resolve, 200));
-    const userRecipes = dummyRecipes.filter(r => r.authorId === userId);
+    const userRecipes = getAllRecipes().filter(r => r.authorId === userId);
     return { success: true, data: userRecipes };
   }
   
